@@ -1,0 +1,21 @@
+{
+  "require": {
+    "guzzlehttp/guzzle": "^7.0",
+    "symfony/dom-crawler": "^5.1",
+    "symfony/css-selector": "^5.1",
+    "ext-pcntl": "*",
+    "ext-shmop": "*",
+    "predis/predis": "^1.1"
+  },
+  "autoload": {
+    "files": [
+      "functions/getPage.php",
+      "functions/parsePage.php",
+      "functions/getDbCon.php",
+      "functions/writeToDb.php",
+      "functions/parse.php",
+      "constants/constants.php",
+      "constants/db.php"
+    ]
+  }
+}
