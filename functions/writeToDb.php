@@ -47,6 +47,10 @@ function writeToDb($data)
         fwrite($error, $e->getMessage() . "\n");
         throw $e;
     }
-    $dbh->commit();
-    fwrite($success, "Successful written id = $question_id \n");
+    if($dbh->commit())
+    {
+        fwrite($success, "Successful written id = $question_id \n");
+        return true;
+    }
+    return false;
 }

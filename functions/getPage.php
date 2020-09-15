@@ -26,7 +26,7 @@ function getPage($url)
             ]);
             $result = $result->getBody()->getContents();
             fwrite($success,"$url successful received \n");
-            return $result;
+            return $result ?? false;
         } catch (ConnectException $e) {
             fwrite($error,'$url ' . $e->getMessage(). "\n");
             $i++;

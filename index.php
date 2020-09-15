@@ -1,6 +1,6 @@
 <?php
 
-define('PROCESSES_NUM', 500);
+define('PROCESSES_NUM', 100);
 
 require_once __DIR__ . '/vendor/autoload.php';
 
@@ -42,21 +42,18 @@ while (true) {
 //            echo 'I am forked process with pid ' . $myPid. PHP_EOL;
             $data = getRedis()->brpop(['thirdPage', 'secondPage', 'firstPage'], 10);
             switch ($data[0]) {
-                case 'startUrl':
-                    $result = parse($data[1], filter['link']);
-                    getRedis()->lpush('firstPage', $result);
-                    break;
                 case 'firstPage':
                     $result = parse($data[1], filter['link']);
-                    getRedis()->lpush('secondPage', $result);
+                    $result ? getRedis()->lpush('secondPage', $result) : getRedis()->lpush('firstPage',$data[1]);
                     break;
                 case 'secondPage':
                     $result = parse($data[1], filter['questionLink']);
-                    getRedis()->lpush('thirdPage', $result);
+                    $result ? getRedis()->lpush('thirdPage', $result) : getRedis()->lpush('secondPage',$data[1]);
                     break;
                 case 'thirdPage':
                     $result = parse($data[1], filter['text']);
-                    writeToDb($result);
+                    $result ? $db = writeToDb($result) : getRedis()->lpush('thirdPage',$data[1]);
+                    $db ? true : getRedis()->lpush('thirdPage',$data[1]);
                     break;
             }
 //            echo 'I am already done ' . $myPid . PHP_EOL;

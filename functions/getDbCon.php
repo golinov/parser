@@ -15,9 +15,9 @@ function getRedis()
 {
     try {
         $redis = new Client();
+        return $redis;
     } catch (ConnectionException $e) {
         echo 'Couldn\'t connected to Redis';
         echo $e->getMessage();
     }
-    return $redis;
 }
