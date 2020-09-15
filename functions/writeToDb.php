@@ -2,24 +2,34 @@
 
 function writeToDb($data)
 {
+    global $fp;
     $dbh = getDbCon();
     try {
-        $dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-        $dbh->beginTransaction();
         $stmt = $dbh->prepare('INSERT INTO questions(question) VALUES (:question)');
         $stmt->bindParam(':question', $data['question']);
         $stmt->execute();
         $question_id = $dbh->lastInsertId();
+
         $stmt = $dbh->prepare('INSERT INTO answers(answer,length) VALUES(:answer, :length)');
-        $stmt->bindParam(':answer', $data['answer']);
-        $stmt->bindParam(':length', $data['length']);
-        $stmt->execute();
-        $answer_id = $dbh->lastInsertId();
-        $dbh->exec("INSERT INTO QuestionsAnswers(question_id,answer_id) VALUES($question_id, $answer_id)");
-        $dbh->commit();
+        foreach ($data['answer'] as $key => $value) {
+            $stmt->bindParam(':answer', $value);
+            $stmt->bindParam(':length', $data['length'][$key]);
+            $stmt->execute();
+            $answer_id[] = $dbh->lastInsertId();
+        }
+
+        $stmt = $dbh->prepare('INSERT INTO QuestionsAnswers(question_id,answer_id) VALUES(?, ?)');
+        foreach ($answer_id as $value) {
+            $stmt->execute([
+                $question_id,
+                $value
+            ]);
+        }
     } catch (PDOException $e) {
         $dbh->rollBack();
+        fwrite($fp,"$e->getMessage() \n");
         throw $e;
-//    $e->getMessage(); //записать в файл
     }
+    $dbh->commit();
+    fwrite($fp,"Successful written id = $question_id \n");
 }

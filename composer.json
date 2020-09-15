@@ -5,7 +5,8 @@
     "symfony/css-selector": "^5.1",
     "ext-pcntl": "*",
     "ext-shmop": "*",
-    "predis/predis": "^1.1"
+    "predis/predis": "^1.1",
+    "ext-pdo": "*"
   },
   "autoload": {
     "files": [
