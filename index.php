@@ -24,16 +24,16 @@ while (true) {
         } elseif ($newPid) {
 
             $childPids[] = $newPid;
-            echo 'Main process have created subprocess ' . $newPid . PHP_EOL;
+//            echo 'Main process have created subprocess ' . $newPid . PHP_EOL;
 
             if ($i == (PROCESSES_NUM-1)) {
-                echo 'Main process is waiting for all subprocesses' . PHP_EOL;
+//                echo 'Main process is waiting for all subprocesses' . PHP_EOL;
                 foreach ($childPids as $childPid) {
                     pcntl_waitpid($childPid, $status);
-                    echo 'OK. Subprocess ' . $childPid . ' is ready' . PHP_EOL;
+//                    echo 'OK. Subprocess ' . $childPid . ' is ready' . PHP_EOL;
 
                 }
-                echo 'OK. All subprocesses are ready' . PHP_EOL;
+//                echo 'OK. All subprocesses are ready' . PHP_EOL;
             }
 
         } else {
@@ -57,10 +57,9 @@ while (true) {
                 case 'thirdPage':
                     $result = parse($data[1], filter['text']);
                     writeToDb($result);
-                    print('written to db' . "\n");
                     break;
             }
-            echo 'I am already done ' . $myPid . PHP_EOL;
+//            echo 'I am already done ' . $myPid . PHP_EOL;
 
             die(0);
 
