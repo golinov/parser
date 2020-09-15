@@ -2,20 +2,37 @@
 
 function writeToDb($data)
 {
-    global $fp;
+    global $error;
+    global $success;
     $dbh = getDbCon();
     try {
-        $stmt = $dbh->prepare('INSERT INTO questions(question) VALUES (:question)');
-        $stmt->bindParam(':question', $data['question']);
-        $stmt->execute();
-        $question_id = $dbh->lastInsertId();
+        $checkQuestion = $dbh->prepare('SELECT question_id FROM questions WHERE question = :question');
+        $checkQuestion->bindParam(':question', $data['question']);
+        $checkQuestion->execute();
+        $questionResult = $checkQuestion->fetchColumn();
+        if (!$questionResult) {
+            $question = $dbh->prepare('INSERT INTO questions(question) VALUES (:question)');
+            $question->bindParam(':question', $data['question']);
+            $question->execute();
+            $question_id = $dbh->lastInsertId();
+        } else $question_id = $questionResult;
 
-        $stmt = $dbh->prepare('INSERT INTO answers(answer,length) VALUES(:answer, :length)');
+        $checkAnswer = $dbh->prepare('SELECT answer_id FROM answers WHERE answer = :answer');
         foreach ($data['answer'] as $key => $value) {
-            $stmt->bindParam(':answer', $value);
-            $stmt->bindParam(':length', $data['length'][$key]);
-            $stmt->execute();
-            $answer_id[] = $dbh->lastInsertId();
+            $checkAnswer->bindParam(':answer', $value);
+            $checkAnswer->execute();
+            $answer_id[$key] = $checkAnswer->fetchColumn();
+            if ($answer_id[$key]) {
+                unset($data['answer'][$key]);
+                unset($data['length'][$key]);
+            }
+        }
+        $answer = $dbh->prepare('INSERT INTO answers(answer,length) VALUES(:answer, :length)');
+        foreach ($data['answer'] as $key => $value) {
+            $answer->bindParam(':answer', $value);
+            $answer->bindParam(':length', $data['length'][$key]);
+            $answer->execute();
+            $answer_id[$key] = $dbh->lastInsertId();
         }
 
         $stmt = $dbh->prepare('INSERT INTO QuestionsAnswers(question_id,answer_id) VALUES(?, ?)');
@@ -27,9 +44,9 @@ function writeToDb($data)
         }
     } catch (PDOException $e) {
         $dbh->rollBack();
-        fwrite($fp,"$e->getMessage() \n");
+        fwrite($error, $e->getMessage() . "\n");
         throw $e;
     }
     $dbh->commit();
-    fwrite($fp,"Successful written id = $question_id \n");
+    fwrite($success, "Successful written id = $question_id \n");
 }

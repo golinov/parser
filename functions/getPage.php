@@ -11,23 +11,24 @@ use GuzzleHttp\Exception\ConnectException;
  */
 function getPage($url)
 {
-    global $fp;
+    global $error;
+    global $success;
     $proxy = file('proxy_list.txt');
     $i = 0;
     $client = new Client();
     while (true) {
         try {
             $result = $client->request('GET', $url, [
-                'connect_timeout' => 5,
+                'connect_timeout' => 2,
                 'proxy' => [
                     'http' => $proxy[array_rand($proxy)]
                 ]
             ]);
             $result = $result->getBody()->getContents();
-            fwrite($fp,"$url successful received \n");
+            fwrite($success,"$url successful received \n");
             return $result;
         } catch (ConnectException $e) {
-            fwrite($fp,"$url $e->getMessage() \n");
+            fwrite($error,'$url ' . $e->getMessage(). "\n");
             $i++;
             if ($i === count($proxy)) {
                 throw $e;

@@ -11,9 +11,10 @@ function parsePage($html, $filter)
 {
     $crawler = new Crawler($html);
     if ($filter['type'] === 'link' || $filter['type'] === 'questionLink') {
-        return $crawler = $crawler->filter($filter['filter'])->each(function (Crawler $node, $i) {
+        $result = $crawler = $crawler->filter($filter['filter'])->each(function (Crawler $node, $i) {
             return $node->link()->getUri();
         });
+        return array_unique($result);
     } else {
         $question = $crawler->filter($filter['filter']['question'])->text();
         $answer = $crawler->filter($filter['filter']['answer'])->each(function (Crawler $node, $i) {
