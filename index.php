@@ -39,7 +39,7 @@ while (true) {
         } else {
 
             $myPid = getmypid();
-            echo 'I am forked process with pid ' . $myPid. PHP_EOL;
+//            echo 'I am forked process with pid ' . $myPid. PHP_EOL;
             $data = getRedis()->brpop(['thirdPage', 'secondPage', 'firstPage'], 10);
             switch ($data[0]) {
                 case 'startUrl':
