@@ -1,25 +1,22 @@
 <?php
 
-define('PROCESSES_NUM', 100);
+define('PROCESSES_NUM', 500);
 
 require_once __DIR__ . '/vendor/autoload.php';
 
 $fp = fopen('logs/log.txt', 'a'); // open the log file
 //ftruncate($fp, 0); // Clear the log file
 
-$data = getRedis()->brpop('fourthPage', 'thirdPage', 'secondPage', 'firstPage', 1);
+$data = getRedis()->brpop(['thirdPage', 'secondPage', 'firstPage'], 1);
 if (empty($data)) {
     $result = parse(startURL[1],filter['link']);
     getRedis()->lpush('firstPage', $result);
 }
 
 while (true) {
-    $data = getRedis()->brpop('fourthPage', 'thirdPage', 'secondPage', 'firstPage', 10);
-    if (empty($data)) {
-        break;
-    } else
-        var_dump($data);
-//    for ($x = 1; $x < 3; $x++) {
+    print("on queue =  $data[1] \n");
+    sleep(5);
+    for ($i = 1; $i < PROCESSES_NUM; $i++) {
         switch ($pid = pcntl_fork()) {
             case -1:
                 // @fail
@@ -27,6 +24,7 @@ while (true) {
 
             case 0:
                 // @child: Include() misbehaving code here
+                $data = getRedis()->brpop( ['thirdPage', 'secondPage', 'firstPage'], 1);
                 switch ($data[0]) {
                     case 'startUrl':
                         $result = parse($data[1], filter['link']);
@@ -53,8 +51,10 @@ while (true) {
                 pcntl_waitpid($pid, $status);
                 break;
         }
-//    }
-    print "Completed first iteration \n";
+    }
+    if (empty($data)) {
+        break;
+    }
 }
 
 print('Completed.');

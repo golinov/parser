@@ -1,13 +1,13 @@
 <?php
 
 use GuzzleHttp\Client;
-use GuzzleHttp\Exception\GuzzleException;
+use GuzzleHttp\Exception\ConnectException;
 
 /**
  * @param $url string url
  * @param $proxy array of proxies
  * @return string page
- * @throws \GuzzleHttp\Exception\GuzzleException
+ * @throws \GuzzleHttp\Exception\ConnectException
  */
 function getPage($url)
 {
@@ -26,7 +26,7 @@ function getPage($url)
             $result = $result->getBody()->getContents();
             fwrite($fp,"$url successful received \n");
             return $result;
-        } catch (GuzzleException $e) {
+        } catch (ConnectException $e) {
             fwrite($fp,"$url $e->getMessage() \n");
             $i++;
             if ($i === count($proxy)) {
