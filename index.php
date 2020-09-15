@@ -1,6 +1,6 @@
 <?php
 
-define('PROCESSES_NUM', 100);
+define('PROCESSES_NUM', 150);
 
 require_once __DIR__ . '/vendor/autoload.php';
 
@@ -53,7 +53,7 @@ while (true) {
                 case 'thirdPage':
                     $result = parse($data[1], filter['text']);
                     $result ? $db = writeToDb($result) : getRedis()->lpush('thirdPage',$data[1]);
-                    $db ? true : getRedis()->lpush('thirdPage',$data[1]);
+                    $db ? null : getRedis()->lpush('thirdPage',$data[1]);
                     break;
             }
 //            echo 'I am already done ' . $myPid . PHP_EOL;
