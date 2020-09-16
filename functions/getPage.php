@@ -4,13 +4,12 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Exception\ServerException;
 use GuzzleHttp\Exception\TooManyRedirectsException;
-use \GuzzleHttp\Exception\RequestException;
 
 /**
  * @param $url string url
  * @param $proxy array of proxies
  * @return string page
- * @throws ConnectException|ServerException|TooManyRedirectsException|RequestException
+ * @throws ConnectException|ServerException|TooManyRedirectsException
  */
 function getPage($url)
 {
@@ -32,13 +31,10 @@ function getPage($url)
             return $result;
         } catch (ConnectException|ServerException|TooManyRedirectsException $e) {
             fwrite($error, $url . $e->getMessage() . "\n");
-            print("Retry connect\n");
             $i++;
             if (isset($e) && $i === count($proxy)) {
                 return false;
         }
-        } catch (RequestException $exception) {
-            print("Retry connect\n");
         }
     }
 }
