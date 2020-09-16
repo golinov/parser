@@ -44,7 +44,7 @@ while (true) {
 
             $myPid = getmypid();
 //            echo 'I am forked process with pid ' . $myPid. PHP_EOL;
-            $data = getRedis()->brpop(['thirdPage', 'secondPage', 'firstPage'], 2);
+            $data = getRedis()->brpop(['fourthPage','thirdPage', 'secondPage', 'firstPage'], 2);
             switch ($data[0]) {
                 case 'firstPage':
                     $result = parse($data[1], filter['link']);
@@ -56,7 +56,14 @@ while (true) {
                     break;
                 case 'thirdPage':
                     $result = parse($data[1], filter['text']);
-                    $result ? writeToDb($result) : getRedis()->lpush('thirdPage', $data[1]);
+                    $result ? $db = writeToDb($result) : getRedis()->lpush('thirdPage', $data[1]);
+                    while(true) {
+                        $db ? true : writeToDb($result);
+                        if(true)
+                        {
+                            break;
+                        }
+                    }
                     break;
             }
 //            echo 'I am already done ' . $myPid . PHP_EOL;

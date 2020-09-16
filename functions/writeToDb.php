@@ -5,8 +5,8 @@ function writeToDb($data)
     global $error;
     global $success;
     $dbh = getDbCon();
-    $dbh->beginTransaction();
     try {
+        $dbh->beginTransaction();
         $checkQuestion = $dbh->prepare('SELECT question_id FROM questions WHERE question = ?');
         $checkQuestion->execute([
             $data['question']
@@ -43,11 +43,12 @@ function writeToDb($data)
                 $value
             ]);
         }
+        $result = $dbh->commit();
+        fwrite($success, "Successful written id = $question_id \n");
+        return $result;
     } catch (PDOException|Exception $e) {
+        fwrite($error, 'question = ' . $data['question']. ' ' . $e->getMessage() . "\n");
         $dbh->rollBack();
-        fwrite($error, $e->getMessage() . "\n");
         return false;
     }
-    fwrite($success, "Successful written id = $question_id \n");
-    return $dbh->commit();
 }
