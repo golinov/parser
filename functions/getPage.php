@@ -34,7 +34,7 @@ function getPage($url)
             $i++;
             if (isset($e) && $i === count($proxy)) {
                 return false;
-        }
+            }
         }
     }
 }
