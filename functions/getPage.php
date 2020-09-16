@@ -2,12 +2,16 @@
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ConnectException;
+use GuzzleHttp\Exception\ServerException;
+use GuzzleHttp\Exception\TooManyRedirectsException;
+
+//use \GuzzleHttp\Exception\RequestException;
 
 /**
  * @param $url string url
  * @param $proxy array of proxies
  * @return string page
- * @throws \GuzzleHttp\Exception\ConnectException
+ * @throws ConnectException|ServerException|TooManyRedirectsException|RequestException
  */
 function getPage($url)
 {
@@ -25,13 +29,14 @@ function getPage($url)
                 ]
             ]);
             $result = $result->getBody()->getContents();
-            fwrite($success,"$url successful received \n");
-            return $result ?? false;
-        } catch (ConnectException $e) {
-            fwrite($error,'$url ' . $e->getMessage(). "\n");
+            fwrite($success, "$url successful received \n");
+            return $result;
+        } catch (ConnectException|ServerException|TooManyRedirectsException $e) {
+            fwrite($error, $url . $e->getMessage() . "\n");
             $i++;
-            if ($i === count($proxy)) {
-                throw $e;
+        } finally {
+            if (isset($e) && $i === count($proxy)) {
+                return false;
             }
         }
     }

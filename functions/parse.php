@@ -1,7 +1,7 @@
 <?php
 
-function parse($html,$filter)
+function parse($html, $filter)
 {
     $page = getPage($html);
-    return $page ? parsePage($page,$filter) : false;
+    return $page ? parsePage($page, $filter) : false;
 }

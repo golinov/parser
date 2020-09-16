@@ -7,7 +7,6 @@ function getDbCon()
 {
     $dbh = new PDO('mysql:host='.\host.';dbname='.\db, \user, \pass);
     $dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-    $dbh->beginTransaction();
     return $dbh;
 }
 
